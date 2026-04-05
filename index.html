@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hadoop-Spark Cluster - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .link-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .link-item:last-child {
+            border-bottom: none;
+        }
+        
+        .link-item a {
+            flex: 1;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .link-item a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .status-icon {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background: #4CAF50;
+        }
+        
+        .port {
+            color: #999;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 1.5em;
+            margin: 30px 0 20px 0;
+            padding-left: 10px;
+            border-left: 4px solid white;
+        }
+        
+        .command-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+            border-left: 3px solid #667eea;
+        }
+        
+        .instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .status-ready {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            color: #FF9800;
+            font-weight: bold;
+        }
+        
+        .status-error {
+            color: #f44336;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Hadoop-Spark Cluster</h1>
+            <p>Big Data Processing Platform on Docker Compose</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>⚡ Quick Start</h3>
+            <ol>
+                <li>Run <strong>start-cluster.bat</strong> to start the cluster</li>
+                <li>Wait 5-10 minutes for all services to be ready</li>
+                <li>Open the Web UIs below in your browser</li>
+                <li>Access Jupyter Notebook to run examples</li>
+                <li>Run <strong>stop-cluster.bat</strong> to stop the cluster</li>
+            </ol>
+        </div>
+        
+        <div class="section-title">📊 Web User Interfaces</div>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">📁 Hadoop HDFS</div>
+                <div class="card-content">
+                    <div class="link-item">
+                        <span class="status-icon"></span>
+                        <a href="http://localhost:9870" target="_blank">NameNode UI</a>
+                        <span class="port">:9870</span>
+                    </div>
+                    <div class="link-item">
+                        <span class="status-icon"></span>
+                        <a href="http://localhost:8088" target="_blank">YARN ResourceManager</a>
+                        <span class="port">:8088</span>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <strong>Status:</strong> <span class="status-ready">Ready</span><br>
+                        <strong>Nodes:</strong> 1 Master + 2 Workers<br>
+                        <strong>Version:</strong> Hadoop 3.3.6
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">⚡ Apache Spark</div>
+                <div class="card-content">
+                    <div class="link-item">
+                        <span class="status-icon"></span>
+                        <a href="http://localhost:8080" target="_blank">Spark Master</a>
+                        <span class="port">:8080</span>
+                    </div>
+                    <div class="link-item">
+                        <span class="status-icon"></span>
+                        <a href="http://localhost:8081" target="_blank">Spark Worker 1</a>
+                        <span class="port">:8081</span>
+                    </div>
+                    <div class="link-item">
+                        <span class="status-icon"></span>
+                        <a href="http://localhost:8082" target="_blank">Spark Worker 2</a>
+                        <span class="port">:8082</span>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <strong>Status:</strong> <span class="status-ready">Ready</span><br>
+                        <strong>Nodes:</strong> 1 Master + 2 Workers<br>
+                        <strong>Version:</strong> Spark 3.5.0
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">📓 Jupyter Notebook</div>
+                <div class="card-content">
+                    <div class="link-item">
+                        <span class="status-icon"></span>
+                        <a href="http://localhost:8888" target="_blank">Open Jupyter</a>
+                        <span class="port">:8888</span>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <strong>Status:</strong> <span class="status-ready">Ready</span><br>
+                        <strong>Kernel:</strong> PySpark<br>
+                        <strong>Access:</strong> No password needed
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-title">📚 Jupyter Notebooks</div>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">01 - Test Connection</div>
+                <div class="card-content">
+                    <p style="margin-bottom: 15px;">Test PySpark connection to Hadoop cluster and Spark cluster.</p>
+                    <p><strong>Contents:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Spark Session creation</li>
+                        <li>HDFS connectivity test</li>
+                        <li>DataFrame operations</li>
+                        <li>RDD operations</li>
+                        <li>SQL queries</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">02 - WordCount Example</div>
+                <div class="card-content">
+                    <p style="margin-bottom: 15px;">Classic MapReduce WordCount example using PySpark.</p>
+                    <p><strong>Contents:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Sample text generation</li>
+                        <li>RDD-based WordCount</li>
+                        <li>DataFrame-based WordCount</li>
+                        <li>Results saved to HDFS</li>
+                        <li>Visualization</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">03 - Data Processing Pipeline</div>
+                <div class="card-content">
+                    <p style="margin-bottom: 15px;">Realistic data processing pipeline for sales data.</p>
+                    <p><strong>Contents:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Data generation</li>
+                        <li>Transformation & cleaning</li>
+                        <li>Aggregation & analysis</li>
+                        <li>Window functions</li>
+                        <li>SQL queries</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-title">🎯 Common Commands</div>
+        
+        <div class="card" style="max-width: 600px; margin-bottom: 30px;">
+            <div class="card-content">
+                <strong>Start Cluster:</strong>
+                <div class="command-box">start-cluster.bat</div>
+                
+                <strong>Stop Cluster:</strong>
+                <div class="command-box">stop-cluster.bat</div>
+                
+                <strong>View Logs:</strong>
+                <div class="command-box">docker-compose logs -f</div>
+                
+                <strong>SSH to Hadoop Master:</strong>
+                <div class="command-box">docker exec -it hadoop-master bash</div>
+                
+                <strong>List HDFS Files:</strong>
+                <div class="command-box">docker exec hadoop-master hdfs dfs -ls /</div>
+                
+                <strong>SSH to Jupyter:</strong>
+                <div class="command-box">docker exec -it jupyter-notebook bash</div>
+            </div>
+        </div>
+        
+        <div class="section-title">📖 Documentation</div>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">README.md</div>
+                <div class="card-content">
+                    Complete documentation with all details about the cluster, configuration, commands, and troubleshooting.
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">QUICKSTART.md</div>
+                <div class="card-content">
+                    Quick reference guide for getting started with the Hadoop-Spark cluster in 5 minutes.
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">PROJECT-SUMMARY.md</div>
+                <div class="card-content">
+                    Overview of the project structure, all completed components, and project status.
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-title">🛠️ System Information</div>
+        
+        <div class="card" style="max-width: 600px;">
+            <div class="card-content">
+                <strong>Versions:</strong><br>
+                <span class="badge">Hadoop 3.3.6</span>
+                <span class="badge">Spark 3.5.0</span>
+                <span class="badge">Java 11</span>
+                <span class="badge">Python 3.9</span>
+                <span class="badge">Ubuntu 22.04</span>
+                <br><br>
+                
+                <strong>Components:</strong><br>
+                <ul style="margin-left: 20px;">
+                    <li>✅ HDFS with 1 Master + 2 Workers</li>
+                    <li>✅ YARN ResourceManager</li>
+                    <li>✅ Spark with 1 Master + 2 Workers</li>
+                    <li>✅ Jupyter Notebook with PySpark</li>
+                    <li>✅ Health checks for all services</li>
+                    <li>✅ Persistent volumes for data</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Hadoop-Spark Cluster | Version 1.0 | 2026-04-01</p>
+            <p style="margin-top: 10px; opacity: 0.8;">Ready for Big Data Processing! 🚀</p>
+        </div>
+    </div>
+</body>
+</html>

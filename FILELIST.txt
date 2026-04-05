@@ -1,0 +1,251 @@
+HADOOP-SPARK CLUSTER - COMPLETE FILE LIST
+===========================================
+
+📍 Location: d:\BIGDATA\Hoang\hadoop-hoang
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 START HERE
+
+✨ START-HERE.txt ......................... You are here!
+👋 WELCOME.bat ........................... Welcome screen (double-click)
+📖 README.md ............................. Complete documentation
+⚡ QUICKSTART.md ......................... Quick start guide
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 STARTUP SCRIPTS
+
+📍 Windows
+  • start-cluster.bat ..................... Start cluster
+  • stop-cluster.bat ...................... Stop cluster
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🐳 DOCKER CONFIGURATION
+
+docker-compose.yml ........................ Main orchestration file
+.dockerignore ............................ Docker build ignore
+.env .................................... Environment variables
+
+📍 Dockerfiles (docker/ directory)
+  • Dockerfile.hadoop ..................... Hadoop image
+  • Dockerfile.spark ...................... Spark image
+  • Dockerfile.jupyter .................... Jupyter image
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️ CONFIGURATION FILES
+
+📍 config/hadoop/ directory
+  • core-site.xml ......................... HDFS NameNode config
+  • hdfs-site.xml ......................... HDFS DataNode config
+  • yarn-site.xml ......................... YARN config
+
+📍 config/spark/ directory
+  • spark-defaults.conf ................... Spark config
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ ENTRYPOINT SCRIPTS
+
+📍 scripts/ directory
+  • entrypoint-hadoop-master.sh ........... Hadoop Master startup
+  • entrypoint-hadoop-worker.sh .......... Hadoop Worker startup
+  • entrypoint-spark-master.sh ........... Spark Master startup
+  • entrypoint-spark-worker.sh ........... Spark Worker startup
+  • healthcheck.sh ........................ Health check script
+  • init-hadoop.sh ........................ Hadoop initialization
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📓 JUPYTER NOTEBOOKS
+
+📍 notebooks/ directory
+  • 01-Test-Connection.ipynb .............. Test HDFS & Spark
+  • 02-WordCount-Example.ipynb ........... WordCount MapReduce
+  • 03-Data-Processing-Pipeline.ipynb .... Data processing
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DOCUMENTATION
+
+README.md ................................ Full documentation
+QUICKSTART.md ............................ Quick reference
+PROJECT-SUMMARY.md ....................... Project overview
+NETWORK-CONFIG.md ........................ Network & ports guide
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 DEVELOPMENT FILES
+
+Makefile ................................. Useful commands
+index.html ............................... Web dashboard
+FILELIST.txt ............................. This file
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💾 DATA VOLUMES
+
+volumes/hadoop_name/ ..................... NameNode persistent storage
+volumes/hadoop_data/ ..................... DataNode persistent storage
+
+These directories are created automatically when cluster starts.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 TOTAL FILE COUNT
+
+✅ Docker Files: 3
+✅ Configuration Files: 4
+✅ Script Files: 6
+✅ Jupyter Notebooks: 3
+✅ Documentation: 5
+✅ Utility Files: 2
+✅ Directory Structure: Created
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 HOW TO USE THIS PROJECT
+
+1. READ
+   → Open START-HERE.txt (you're here!)
+   → Read README.md for complete guide
+
+2. SETUP
+   → Run start-cluster.bat (Windows) or ./start-cluster.sh (Linux/Mac)
+   → Wait 5-10 minutes for services
+
+3. VERIFY
+   → Open http://localhost:9870 (Hadoop)
+   → Open http://localhost:8080 (Spark)
+   → Open http://localhost:8888 (Jupyter)
+
+4. EXPLORE
+   → Open Jupyter notebooks
+   → Run examples
+   → Create your own jobs
+
+5. STOP
+   → Run stop-cluster.bat (Windows) or ./stop-cluster.sh (Linux/Mac)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔗 IMPORTANT LINKS
+
+Local Cluster URLs:
+  • Hadoop NameNode: http://localhost:9870
+  • YARN UI: http://localhost:8088
+  • Spark Master: http://localhost:8080
+  • Spark Worker 1: http://localhost:8081
+  • Spark Worker 2: http://localhost:8082
+  • Jupyter Notebook: http://localhost:8888
+
+Container Names:
+  • hadoop-master
+  • hadoop-worker-1
+  • hadoop-worker-2
+  • spark-master
+  • spark-worker-1
+  • spark-worker-2
+  • jupyter-notebook
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ KEY FEATURES
+
+✅ 1 Hadoop Master + 2 Workers (HDFS, YARN)
+✅ 1 Spark Master + 2 Workers
+✅ Jupyter Notebook with PySpark
+✅ Complete configuration files
+✅ Health checks & service dependencies
+✅ Persistent data volumes
+✅ Example Jupyter notebooks
+✅ Full documentation
+✅ Windows & Linux support
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 QUICK COMMANDS
+
+Start cluster:
+  Windows: start-cluster.bat
+  Linux/Mac: ./start-cluster.sh
+
+Stop cluster:
+  stop-cluster.bat
+
+View status:
+  docker-compose ps
+
+View logs:
+  docker-compose logs -f
+
+SSH into container:
+  docker exec -it hadoop-master bash
+  docker exec -it spark-master bash
+  docker exec -it jupyter-notebook bash
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 PROJECT CHECKLIST
+
+✅ Hadoop cluster setup
+✅ Spark cluster setup
+✅ HDFS configuration
+✅ YARN configuration
+✅ Spark configuration
+✅ Jupyter setup
+✅ Docker Compose orchestration
+✅ Startup scripts (Windows & Linux/Mac)
+✅ Health checks
+✅ Example notebooks
+✅ Complete documentation
+✅ Network configuration guide
+✅ Troubleshooting guide
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎓 LEARNING RESOURCES
+
+1. Start with QUICKSTART.md for quick setup
+2. Read README.md for complete documentation
+3. Check NETWORK-CONFIG.md for network details
+4. Run 01-Test-Connection.ipynb to test connectivity
+5. Run 02-WordCount-Example.ipynb for MapReduce example
+6. Run 03-Data-Processing-Pipeline.ipynb for advanced example
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 READY TO START!
+
+1. Double-click: start-cluster.bat
+2. Wait 5-10 minutes
+3. Open: http://localhost:8888
+4. Run Jupyter examples
+5. Have fun with Big Data! 🎉
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 SUPPORT
+
+For troubleshooting:
+1. Check README.md "Troubleshooting" section
+2. View logs: docker-compose logs
+3. Check specific service: docker-compose logs <service>
+4. SSH into container: docker exec -it <container> bash
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Version: 1.0
+Created: 2026-04-01
+Status: ✅ COMPLETE & READY TO USE
+
+Tạo bởi: Chuyên gia Big Data & Docker
+Phiên bản Hadoop: 3.3.6
+Phiên bản Spark: 3.5.0
+Platform: Windows, Linux, Mac
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Happy Big Data Processing! 🚀✨

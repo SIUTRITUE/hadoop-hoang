@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+    <!-- NameNode Configuration -->
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>/data/namenode</value>
+    </property>
+
+    <!-- DataNode Configuration -->
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>/data/datanode</value>
+    </property>
+
+    <!-- DataNode permissions (755 = rwxr-xr-x) -->
+    <property>
+        <name>dfs.datanode.data.dir.perm</name>
+        <value>755</value>
+    </property>
+
+    <!-- Disable file permissions for Docker volumes -->
+    <property>
+        <name>dfs.permissions.enabled</name>
+        <value>false</value>
+    </property>
+
+    <!-- Skip DataNode directory permission checks -->
+    <property>
+        <name>dfs.datanode.skip.dir.check</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>dfs.replication</name>
+        <value>2</value>
+    </property>
+
+    <!-- NameNode web UI binding address -->
+    <property>
+        <name>dfs.namenode.http-address</name>
+        <value>0.0.0.0:9870</value>
+    </property>
+
+    <!-- DataNode web UI binding address -->
+    <property>
+        <name>dfs.datanode.http.address</name>
+        <value>0.0.0.0:9864</value>
+    </property>
+
+    <!-- NameNode RPC binding address -->
+    <property>
+        <name>dfs.namenode.rpc-address</name>
+        <value>hadoop-master:9000</value>
+    </property>
+
+    <!-- Secondary NameNode web UI -->
+    <property>
+        <name>dfs.namenode.secondary.http-address</name>
+        <value>0.0.0.0:9868</value>
+    </property>
+
+    <!-- Allow Remote RPC Port Binding -->
+    <property>
+        <name>dfs.client.read.shortcircuit</name>
+        <value>false</value>
+    </property>
+
+    <!-- Prevent permission errors -->
+    <property>
+        <name>dfs.permissions</name>
+        <value>false</value>
+    </property>
+
+    <!-- Namenode trash time -->
+    <property>
+        <name>fs.trash.interval</name>
+        <value>360</value>
+    </property>
+
+    <!-- Allow hadoop user to impersonate others -->
+    <property>
+        <name>dfs.webhdfs.enabled</name>
+        <value>true</value>
+    </property>
+</configuration>

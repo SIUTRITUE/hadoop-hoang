@@ -1,0 +1,60 @@
+FROM ubuntu:22.04
+
+# Set environment variables
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV HADOOP_HOME=/opt/hadoop
+ENV PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
+ENV HADOOP_HDFS_HOME=$HADOOP_HOME
+ENV HADOOP_YARN_HOME=$HADOOP_HOME
+ENV HADOOP_MAPRED_HOME=$HADOOP_HOME
+ENV LD_LIBRARY_PATH=$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    openjdk-11-jdk \
+    curl \
+    wget \
+    openssh-server \
+    openssh-client \
+    net-tools \
+    iputils-ping \
+    dnsutils \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create hadoop user
+RUN useradd -m -s /bin/bash hadoop
+RUN mkdir -p /home/hadoop/.ssh
+
+# Setup SSH
+RUN mkdir -p /var/run/sshd
+RUN ssh-keygen -A
+RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+
+# Download and install Hadoop 3.3.6
+RUN cd /opt && \
+    wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz && \
+    tar -xzf hadoop-3.3.6.tar.gz && \
+    mv hadoop-3.3.6 hadoop && \
+    chown -R hadoop:hadoop /opt/hadoop && \
+    rm hadoop-3.3.6.tar.gz
+
+# Create necessary directories
+RUN mkdir -p /data/namenode /data/datanode /data/tmp
+RUN chown -R hadoop:hadoop /data
+
+# Copy configuration files (will be provided at runtime)
+RUN mkdir -p $HADOOP_HOME/etc/hadoop
+
+# Enable password-less SSH login
+RUN mkdir -p /home/hadoop/.ssh && \
+    chmod 700 /home/hadoop/.ssh && \
+    chown -R hadoop:hadoop /home/hadoop/.ssh
+
+WORKDIR $HADOOP_HOME
+
+USER hadoop
+
+EXPOSE 9000 9870 8088 8042 50070 50075 50090
+
+CMD ["/bin/bash"]

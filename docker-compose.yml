@@ -1,0 +1,268 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # HADOOP CLUSTER
+  # ============================================
+
+  hadoop-master:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.hadoop
+    container_name: hadoop-master
+    hostname: hadoop-master
+    networks:
+      - hadoop-spark-network
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - HADOOP_HDFS_HOME=/opt/hadoop
+      - HADOOP_YARN_HOME=/opt/hadoop
+      - HADOOP_MAPRED_HOME=/opt/hadoop
+    ports:
+      - "9870:9870"    # Hadoop NameNode UI
+      - "8088:8088"    # YARN ResourceManager UI
+      - "9000:9000"    # HDFS RPC
+      - "8032:8032"    # YARN ResourceManager RPC
+      - "8030:8030"    # YARN Scheduler
+      - "8031:8031"    # YARN Resource Tracker
+      - "19888:19888"  # Job History Server
+      - "10020:10020"  # Job History Server RPC
+    volumes:
+      - ./config/hadoop:/config
+      - hadoop_namenode:/data/namenode
+      - ./scripts:/scripts
+    entrypoint: /bin/bash /scripts/entrypoint-hadoop-master.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9870"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      - network-check
+    restart: unless-stopped
+
+  hadoop-worker-1:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.hadoop
+    container_name: hadoop-worker-1
+    hostname: hadoop-worker-1
+    networks:
+      - hadoop-spark-network
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - HADOOP_HDFS_HOME=/opt/hadoop
+      - HADOOP_YARN_HOME=/opt/hadoop
+      - HADOOP_MAPRED_HOME=/opt/hadoop
+    ports:
+      - "9864:9864"    # DataNode web UI
+      - "8042:8042"    # NodeManager web UI
+    volumes:
+      - ./config/hadoop:/config
+      - hadoop_datanode_worker1:/data/datanode
+      - ./scripts:/scripts
+    entrypoint: /bin/bash /scripts/entrypoint-hadoop-worker.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9864"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      hadoop-master:
+        condition: service_healthy
+    restart: unless-stopped
+
+  hadoop-worker-2:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.hadoop
+    container_name: hadoop-worker-2
+    hostname: hadoop-worker-2
+    networks:
+      - hadoop-spark-network
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - HADOOP_HDFS_HOME=/opt/hadoop
+      - HADOOP_YARN_HOME=/opt/hadoop
+      - HADOOP_MAPRED_HOME=/opt/hadoop
+    ports:
+      - "9865:9864"    # DataNode web UI (mapped to 9865)
+      - "8043:8042"    # NodeManager web UI (mapped to 8043)
+    volumes:
+      - ./config/hadoop:/config
+      - hadoop_datanode_worker2:/data/datanode
+      - ./scripts:/scripts
+    entrypoint: /bin/bash /scripts/entrypoint-hadoop-worker.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9864"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      hadoop-master:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ============================================
+  # SPARK CLUSTER
+  # ============================================
+
+  spark-master:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.spark
+    container_name: spark-master
+    hostname: spark-master
+    networks:
+      - hadoop-spark-network
+    environment:
+      - SPARK_HOME=/opt/spark
+      - HADOOP_HOME=/opt/hadoop
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - LD_LIBRARY_PATH=/opt/hadoop/lib/native
+    ports:
+      - "8080:8080"    # Spark Master UI
+      - "7077:7077"    # Spark Master
+      - "6066:6066"    # Spark REST API
+      - "4040:4040"    # Spark Driver UI
+    volumes:
+      - ./config/spark:/config
+      - ./scripts:/scripts
+    entrypoint: /bin/bash /scripts/entrypoint-spark-master.sh
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "spark.deploy.master.Master"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    depends_on:
+      hadoop-master:
+        condition: service_healthy
+    restart: unless-stopped
+
+  spark-worker-1:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.spark
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    networks:
+      - hadoop-spark-network
+    environment:
+      - SPARK_HOME=/opt/spark
+      - HADOOP_HOME=/opt/hadoop
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - LD_LIBRARY_PATH=/opt/hadoop/lib/native
+    ports:
+      - "8081:8081"    # Spark Worker web UI
+      - "7078:7078"    # Spark Worker
+    volumes:
+      - ./config/spark:/config
+      - ./scripts:/scripts
+    entrypoint: /bin/bash /scripts/entrypoint-spark-worker.sh
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "spark.deploy.worker.Worker"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    restart: unless-stopped
+
+  spark-worker-2:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.spark
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    networks:
+      - hadoop-spark-network
+    environment:
+      - SPARK_HOME=/opt/spark
+      - HADOOP_HOME=/opt/hadoop
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - LD_LIBRARY_PATH=/opt/hadoop/lib/native
+    ports:
+      - "8082:8081"    # Spark Worker web UI (mapped to 8082)
+      - "7079:7078"    # Spark Worker (mapped to 7079)
+    volumes:
+      - ./config/spark:/config
+      - ./scripts:/scripts
+    entrypoint: /bin/bash /scripts/entrypoint-spark-worker.sh
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "spark.deploy.worker.Worker"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ============================================
+  # JUPYTER NOTEBOOK
+  # ============================================
+
+  jupyter:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.jupyter
+    container_name: jupyter-notebook
+    hostname: jupyter
+    networks:
+      - hadoop-spark-network
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - HADOOP_HOME=/opt/hadoop
+      - SPARK_HOME=/opt/spark
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - LD_LIBRARY_PATH=/opt/hadoop/lib/native
+      - PYTHONPATH=/opt/spark/python:/opt/spark/python/lib/py4j-0.10.9.7-src.zip:$PYTHONPATH
+    ports:
+      - "8888:8888"    # Jupyter UI
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./config/spark:/config
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/lab"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ============================================
+  # NETWORK CHECK SERVICE (dummy service for network initialization)
+  # ============================================
+
+  network-check:
+    image: busybox:latest
+    container_name: network-check
+    networks:
+      - hadoop-spark-network
+    command: echo "Network is ready"
+    restart: "no"
+
+networks:
+  hadoop-spark-network:
+    driver: bridge
+
+volumes:
+  hadoop_namenode:
+    driver: local
+  hadoop_datanode_worker1:
+    driver: local
+  hadoop_datanode_worker2:
+    driver: local

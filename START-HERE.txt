@@ -1,0 +1,306 @@
+╔════════════════════════════════════════════════════════════════════╗
+║                                                                    ║
+║        🚀 HADOOP-SPARK CLUSTER ON DOCKER COMPOSE                 ║
+║        Hệ thống Big Data phân tán hoàn chỉnh                       ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+
+✅ PROJECT COMPLETED & READY TO USE!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📁 PROJECT STRUCTURE
+
+hadoop-hoang/
+├── 📄 docker-compose.yml .................. Main orchestration file
+├── 📄 start-cluster.bat ................... Start cluster
+├── 📄 stop-cluster.bat .................... Stop cluster
+│
+├── 📚 Documentation
+│   ├── 📖 README.md ....................... Complete documentation
+│   ├── 📖 QUICKSTART.md ................... 5-minute quick start
+│   ├── 📖 PROJECT-SUMMARY.md .............. Project overview
+│   └── 📖 NETWORK-CONFIG.md ............... Network & ports guide
+│
+├── 🐳 Docker
+│   └── docker/
+│       ├── Dockerfile.hadoop ............. Hadoop images
+│       ├── Dockerfile.spark .............. Spark images
+│       └── Dockerfile.jupyter ............ Jupyter images
+│
+├── ⚙️ Configuration
+│   ├── config/hadoop/
+│   │   ├── core-site.xml ................. HDFS config
+│   │   ├── hdfs-site.xml ................. HDFS data config
+│   │   └── yarn-site.xml ................. YARN config
+│   └── config/spark/
+│       └── spark-defaults.conf ........... Spark config
+│
+├── 🛠️ Scripts
+│   └── scripts/
+│       ├── entrypoint-hadoop-master.sh ... Hadoop Master startup
+│       ├── entrypoint-hadoop-worker.sh ... Hadoop Worker startup
+│       ├── entrypoint-spark-master.sh .... Spark Master startup
+│       ├── entrypoint-spark-worker.sh .... Spark Worker startup
+│       ├── healthcheck.sh ................ Health checks
+│       └── init-hadoop.sh ................ Initialization
+│
+├── 📓 Jupyter Notebooks
+│   └── notebooks/
+│       ├── 01-Test-Connection.ipynb ...... Test HDFS & Spark
+│       ├── 02-WordCount-Example.ipynb .... WordCount example
+│       └── 03-Data-Processing-Pipeline.ipynb .... Data pipeline
+│
+├── 📦 Configuration Files
+│   ├── .env .............................. Environment variables
+│   ├── .dockerignore ..................... Docker build ignore
+│   ├── Makefile .......................... Useful commands
+│   ├── index.html ........................ Web dashboard
+│   └── WELCOME.bat ....................... Welcome screen
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 QUICK START (5 Phút)
+
+1️⃣  Khởi động Cluster
+    Windows:
+        start-cluster.bat
+    
+    Linux/Mac:
+        ./start-cluster.sh
+
+2️⃣  Chờ Services Ready (5-10 phút)
+    - Hadoop Master
+    - Hadoop Workers
+    - Spark Master
+    - Spark Workers
+    - Jupyter
+
+3️⃣  Truy cập Web UIs
+    - Hadoop NameNode: http://localhost:9870
+    - YARN UI: http://localhost:8088
+    - Spark Master: http://localhost:8080
+    - Jupyter: http://localhost:8888
+
+4️⃣  Dừng Cluster
+    stop-cluster.bat (Windows)
+    ./stop-cluster.sh (Linux/Mac)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 SYSTEM COMPONENTS
+
+HADOOP CLUSTER (1 Master + 2 Workers)
+├── NameNode: hadoop-master:9000
+├── ResourceManager: hadoop-master:8088
+└── DataNodes: hadoop-worker-1, hadoop-worker-2
+
+SPARK CLUSTER (1 Master + 2 Workers)
+├── Master: spark-master:7077
+└── Workers: spark-worker-1, spark-worker-2
+
+JUPYTER NOTEBOOK
+└── PySpark kernel with Hadoop/Spark client
+
+VERSIONS
+├── Hadoop 3.3.6
+├── Spark 3.5.0
+├── Java 11
+└── Python 3.9
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌐 WEB INTERFACES
+
+┌─────────────────────────┬──────────────────────────────┐
+│ Service                 │ URL                          │
+├─────────────────────────┼──────────────────────────────┤
+│ Hadoop NameNode UI      │ http://localhost:9870        │
+│ YARN ResourceManager    │ http://localhost:8088        │
+│ Spark Master            │ http://localhost:8080        │
+│ Spark Worker 1          │ http://localhost:8081        │
+│ Spark Worker 2          │ http://localhost:8082        │
+│ Jupyter Notebook        │ http://localhost:8888        │
+└─────────────────────────┴──────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 COMMON COMMANDS
+
+# View container status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+
+# SSH into Hadoop Master
+docker exec -it hadoop-master bash
+
+# SSH into Spark Master
+docker exec -it spark-master bash
+
+# SSH into Jupyter
+docker exec -it jupyter-notebook bash
+
+# List HDFS files
+docker exec hadoop-master hdfs dfs -ls /
+
+# View YARN nodes
+docker exec hadoop-master yarn node -list
+
+# Stop cluster
+docker-compose down
+
+# Stop cluster and remove volumes
+docker-compose down -v
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 JUPYTER EXAMPLES
+
+1. 01-Test-Connection.ipynb
+   ✓ Spark Session creation
+   ✓ HDFS connectivity test
+   ✓ DataFrame operations
+   ✓ SQL queries
+   ✓ RDD operations
+
+2. 02-WordCount-Example.ipynb
+   ✓ Sample text generation
+   ✓ RDD-based WordCount
+   ✓ DataFrame-based WordCount
+   ✓ Save to HDFS
+   ✓ Visualization
+
+3. 03-Data-Processing-Pipeline.ipynb
+   ✓ Sample data generation
+   ✓ Data cleaning
+   ✓ Aggregation
+   ✓ Window functions
+   ✓ SQL queries
+   ✓ Visualization
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 EXAMPLE CODE
+
+from pyspark.sql import SparkSession
+
+# Create Spark Session
+spark = SparkSession.builder \
+    .appName("MyApp") \
+    .master("spark://spark-master:7077") \
+    .config("spark.hadoop.fs.defaultFS", "hdfs://hadoop-master:9000") \
+    .getOrCreate()
+
+# Create DataFrame
+data = [("Alice", 25), ("Bob", 30)]
+df = spark.createDataFrame(data, ["Name", "Age"])
+df.show()
+
+# Save to HDFS
+df.write.mode("overwrite").parquet("hdfs://hadoop-master:9000/output")
+
+# Read from HDFS
+df_read = spark.read.parquet("hdfs://hadoop-master:9000/output")
+df_read.show()
+
+# SQL Query
+df.createOrReplaceTempView("people")
+spark.sql("SELECT * FROM people WHERE Age > 25").show()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❓ TROUBLESHOOTING
+
+Problem: Containers crash
+Solution: docker-compose down -v && start-cluster.bat
+
+Problem: Out of memory
+Solution: Reduce executor memory in docker-compose.yml
+
+Problem: Port conflicts
+Solution: Change port mapping in docker-compose.yml
+
+Problem: Services not ready
+Solution: Check docker-compose logs, increase wait time
+
+Problem: Can't connect to HDFS
+Solution: Check Hadoop Master logs, ensure network connectivity
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DOCUMENTATION
+
+Full Documentation
+  → README.md
+  - Complete setup instructions
+  - All commands and features
+  - Troubleshooting guide
+  - Scaling instructions
+
+Quick Reference
+  → QUICKSTART.md
+  - 5-minute setup
+  - Essential commands
+  - Common issues
+
+Network Configuration
+  → NETWORK-CONFIG.md
+  - Port mappings
+  - Network topology
+  - DNS resolution
+  - Testing procedures
+
+Project Overview
+  → PROJECT-SUMMARY.md
+  - All components
+  - Project structure
+  - Version information
+  - Production notes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 NEXT STEPS
+
+1. ✅ Review all files in the project
+2. ✅ Run start-cluster.bat to start the cluster
+3. ✅ Wait for services to be ready
+4. ✅ Access Hadoop UI (http://localhost:9870)
+5. ✅ Access Spark UI (http://localhost:8080)
+6. ✅ Access Jupyter (http://localhost:8888)
+7. ✅ Run example notebooks
+8. ✅ Create your own Big Data jobs
+9. ✅ Scale the cluster if needed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ FEATURES
+
+✅ Distributed Hadoop with HDFS & YARN
+✅ Distributed Spark cluster
+✅ Jupyter Notebook with PySpark
+✅ Complete configuration files
+✅ Health checks for all services
+✅ Persistent data volumes
+✅ Docker network isolation
+✅ Service dependency management
+✅ Example notebooks & code
+✅ Comprehensive documentation
+✅ Easy scaling
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 Ready for Big Data Processing!
+
+Start the cluster now:
+    start-cluster.bat
+
+Happy Big Data Processing! 🎉
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Version: 1.0
+Created: 2026-04-01
+Project: Hadoop-Spark Cluster on Docker Compose
+Status: ✅ COMPLETE & READY TO USE

@@ -1,0 +1,59 @@
+FROM ubuntu:22.04
+
+# Set environment variables
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV SPARK_HOME=/opt/spark
+ENV HADOOP_HOME=/opt/hadoop
+ENV PATH=$JAVA_HOME/bin:$SPARK_HOME/bin:$SPARK_HOME/sbin:$HADOOP_HOME/bin:$PATH
+ENV LD_LIBRARY_PATH=$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    openjdk-11-jdk \
+    curl \
+    wget \
+    openssh-server \
+    openssh-client \
+    net-tools \
+    iputils-ping \
+    dnsutils \
+    vim \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create spark user
+RUN useradd -m -s /bin/bash spark
+RUN mkdir -p /home/spark/.ssh
+
+# Setup SSH
+RUN mkdir -p /var/run/sshd
+RUN ssh-keygen -A
+
+# Download and install Hadoop 3.3.6 (for compatibility)
+RUN cd /opt && \
+    wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz && \
+    tar -xzf hadoop-3.3.6.tar.gz && \
+    mv hadoop-3.3.6 hadoop && \
+    chown -R spark:spark /opt/hadoop && \
+    rm hadoop-3.3.6.tar.gz
+
+# Download and install Spark 3.5.0
+RUN cd /opt && \
+    wget https://archive.apache.org/dist/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz && \
+    tar -xzf spark-3.5.0-bin-hadoop3.tgz && \
+    mv spark-3.5.0-bin-hadoop3 spark && \
+    chown -R spark:spark /opt/spark && \
+    rm spark-3.5.0-bin-hadoop3.tgz
+
+# Create work directories
+RUN mkdir -p /data/spark /tmp/spark
+RUN chown -R spark:spark /data /tmp/spark
+
+WORKDIR $SPARK_HOME
+
+USER spark
+
+EXPOSE 7077 8080 8081 4040
+
+CMD ["/bin/bash"]
