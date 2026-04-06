@@ -239,37 +239,7 @@ if df is not None:
                 except:
                     st.write(metrics_df)
         else:
-            st.warning("⚠️ CÂU 3 metrics not available. Please run notebook first.")
-            
-            # Show hardcoded values as fallback
-            with col1:
-                st.write("**Hardcoded Model Performance Metrics**")
-                metrics_data = {
-                    'Metric': ['Accuracy', 'Precision', 'Recall', 'F1-Score'],
-                    'Score': [0.1995, 0.1992, 0.1995, 0.1546]
-                }
-                metrics_df = pd.DataFrame(metrics_data)
-                
-                fig = px.bar(
-                    metrics_df,
-                    x='Metric',
-                    y='Score',
-                    title='Model Evaluation Metrics',
-                    color='Score',
-                    color_continuous_scale='Reds',
-                    range_y=[0, 1]
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            
-            with col2:
-                st.write("**Metrics Summary**")
-                col_m1, col_m2 = st.columns(2)
-                with col_m1:
-                    st.metric("Accuracy", "19.95%")
-                    st.metric("Recall", "19.95%")
-                with col_m2:
-                    st.metric("Precision", "19.92%")
-                    st.metric("F1-Score", "15.46%")
+            st.error("❌ CÂU 3 metrics not found in HDFS. Please run notebook to generate results.")
         
         st.write("**Model Details**")
         st.info("""
