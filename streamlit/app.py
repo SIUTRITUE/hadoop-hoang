@@ -3,8 +3,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, sum as spark_sum, avg, count, round as spark_round
-import time
+import warnings
+warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="LAB 5 Dashboard", layout="wide", initial_sidebar_state="expanded")
 
@@ -32,7 +32,7 @@ st.markdown("---")
 
 # Sidebar
 st.sidebar.header("⚙️ Configuration")
-data_source = st.sidebar.radio("Select Data Source:", ["Local File", "HDFS"])
+data_source = st.sidebar.radio("Select Data Source:", ["HDFS", "Local File"])
 
 # Initialize Spark
 @st.cache_resource
@@ -43,29 +43,39 @@ def init_spark():
         .config("spark.sql.adaptive.enabled", "true") \
         .getOrCreate()
 
-spark = init_spark()
-
-# Load Data
+# Load Data with caching
 @st.cache_data
-def load_data(source):
+def load_data_pandas(source):
+    """Load data as Pandas DataFrame for caching"""
     try:
-        if source == "Local File":
-            path = "file:///home/jovyan/work/shop_transactions.csv"
-        else:
-            path = "hdfs://hadoop-master:9000/shop_transactions.csv"
+        from pyspark.sql import SparkSession
+        from pyspark.sql.functions import col
         
-        df = spark.read.csv(path, header=True, inferSchema=True)
-        df = df.withColumn('revenue', col('price') * col('quantity'))
+        spark = init_spark()
+        
+        if source == "HDFS":
+            path = "hdfs://hadoop-master:9000/shop_transactions.csv"
+        else:
+            path = "/home/jovyan/work/shop_transactions.csv"
+        
+        # Load with Spark first
+        spark_df = spark.read.csv(path, header=True, inferSchema=True)
+        spark_df = spark_df.withColumn('revenue', col('price') * col('quantity'))
+        
+        # Convert to Pandas
+        df = spark_df.toPandas()
         return df
     except Exception as e:
         st.error(f"Error loading data: {str(e)}")
         return None
 
-df = load_data(data_source)
+# Load data
+df = load_data_pandas(data_source)
 
 if df is not None:
-    # Overview
-    st.sidebar.metric("📦 Total Rows", f"{df.count():,}")
+    # Overview metrics
+    st.sidebar.metric("📦 Total Rows", f"{len(df):,}")
+    st.sidebar.metric("💰 Total Revenue", f"${df['revenue'].sum():,.0f}")
     
     # Create tabs
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -84,33 +94,21 @@ if df is not None:
         # Top 5 Products
         with col1:
             st.write("**Top 5 Products by Revenue**")
-            top5_query = spark.sql('''
-                SELECT 
-                    productType,
-                    ROUND(SUM(price * quantity), 2) as total_revenue,
-                    COUNT(*) as transaction_count
-                FROM (SELECT price, quantity, productType FROM (
-                    SELECT * FROM df_temp
-                ))
-                GROUP BY productType
-                ORDER BY total_revenue DESC
-                LIMIT 5
-            ''')
-            
-            # Simple approach
-            top5 = df.groupBy('productType').agg(
-                spark_sum('revenue').alias('total_revenue'),
-                count('*').alias('transaction_count')
-            ).orderBy(col('total_revenue').desc()).limit(5).toPandas()
+            top5 = df.groupby('productType').agg({
+                'revenue': 'sum',
+                'price': 'count'
+            }).rename(columns={'price': 'transaction_count'}).reset_index()
+            top5 = top5.sort_values('revenue', ascending=False).head(5)
+            top5['revenue'] = top5['revenue'].round(2)
             
             # Bar chart
             fig = px.bar(
                 top5, 
                 x='productType', 
-                y='total_revenue',
+                y='revenue',
                 title='Top 5 Products by Revenue',
-                labels={'total_revenue': 'Revenue ($)', 'productType': 'Product Type'},
-                color='total_revenue',
+                labels={'revenue': 'Revenue ($)', 'productType': 'Product Type'},
+                color='revenue',
                 color_continuous_scale='Blues'
             )
             st.plotly_chart(fig, use_container_width=True)
@@ -119,14 +117,16 @@ if df is not None:
         # Revenue by Region
         with col2:
             st.write("**Revenue by Region**")
-            region_revenue = df.groupBy('customerRegion').agg(
-                spark_sum('revenue').alias('total_revenue'),
-                count('*').alias('count')
-            ).orderBy(col('total_revenue').desc()).toPandas()
+            region_revenue = df.groupby('customerRegion').agg({
+                'revenue': 'sum',
+                'price': 'count'
+            }).rename(columns={'price': 'count'}).reset_index()
+            region_revenue = region_revenue.sort_values('revenue', ascending=False)
+            region_revenue['revenue'] = region_revenue['revenue'].round(2)
             
             fig = px.pie(
                 region_revenue,
-                values='total_revenue',
+                values='revenue',
                 names='customerRegion',
                 title='Revenue Distribution by Region'
             )
@@ -134,12 +134,14 @@ if df is not None:
         
         # All products stats
         st.write("**All Products Statistics**")
-        all_products = df.groupBy('productType').agg(
-            count('*').alias('count'),
-            spark_round(avg('price'), 2).alias('avg_price'),
-            spark_round(avg('revenue'), 2).alias('avg_revenue'),
-            spark_round(spark_sum('revenue'), 2).alias('total_revenue')
-        ).orderBy(col('total_revenue').desc()).toPandas()
+        all_products = df.groupby('productType').agg({
+            'price': ['count', 'mean'],
+            'revenue': 'sum'
+        }).reset_index()
+        all_products.columns = ['productType', 'count', 'avg_price', 'total_revenue']
+        all_products = all_products.sort_values('total_revenue', ascending=False)
+        all_products['avg_price'] = all_products['avg_price'].round(2)
+        all_products['total_revenue'] = all_products['total_revenue'].round(2)
         
         st.dataframe(all_products, use_container_width=True)
 
@@ -195,34 +197,28 @@ if df is not None:
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.metric("Total Transactions", f"{df.count():,}")
+            st.metric("Total Transactions", f"{len(df):,}")
         with col2:
-            total_revenue = df.agg(spark_sum('revenue')).collect()[0][0]
-            st.metric("Total Revenue", f"${total_revenue:,.0f}")
+            st.metric("Total Revenue", f"${df['revenue'].sum():,.0f}")
         with col3:
-            avg_price = df.agg(avg('price')).collect()[0][0]
-            st.metric("Avg Price", f"${avg_price:.2f}")
+            st.metric("Avg Price", f"${df['price'].mean():.2f}")
         with col4:
-            avg_qty = df.agg(avg('quantity')).collect()[0][0]
-            st.metric("Avg Quantity", f"{avg_qty:.2f}")
+            st.metric("Avg Quantity", f"{df['quantity'].mean():.2f}")
         
         # Distribution charts
         col1, col2 = st.columns(2)
         
         with col1:
-            price_dist = df.select('price').toPandas()
-            fig = px.histogram(price_dist, x='price', nbins=50, title='Price Distribution')
+            fig = px.histogram(df, x='price', nbins=50, title='Price Distribution')
             st.plotly_chart(fig, use_container_width=True)
         
         with col2:
-            qty_dist = df.select('quantity').toPandas()
-            fig = px.histogram(qty_dist, x='quantity', nbins=50, title='Quantity Distribution')
+            fig = px.histogram(df, x='quantity', nbins=50, title='Quantity Distribution')
             st.plotly_chart(fig, use_container_width=True)
         
         # Data preview
         st.write("**Data Preview**")
-        sample_data = df.limit(100).toPandas()
-        st.dataframe(sample_data, use_container_width=True)
+        st.dataframe(df.head(100), use_container_width=True)
 
     # TAB 4: INFO
     with tab4:

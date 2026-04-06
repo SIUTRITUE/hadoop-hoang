@@ -1,23 +1,19 @@
-FROM python:3.10-slim
+FROM jupyter/pyspark-notebook:python-3.10
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    openjdk-11-jdk \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+USER root
 
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+# Copy app files
+COPY streamlit/ /app/
 
+# Install Streamlit and additional packages
 RUN pip install --no-cache-dir \
     streamlit==1.28.0 \
-    pyspark==3.5.0 \
-    pandas==2.0.0 \
-    matplotlib==3.7.0 \
     plotly==5.17.0 \
-    numpy==1.24.0
+    pyspark==3.5.0
 
-COPY streamlit/ /app/
+USER jovyan
 
 EXPOSE 8501
 

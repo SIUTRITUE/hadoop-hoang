@@ -261,8 +261,8 @@ services:
 
   streamlit:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.streamlit
+      context: .
+      dockerfile: docker/Dockerfile.streamlit
     container_name: streamlit-app
     hostname: streamlit
     networks:
