@@ -1,366 +1,730 @@
-# 🐘 Hadoop-Spark Big Data Cluster# 🐘 Hadoop-Spark Cluster Infrastructure
+# 🐘 Hadoop-Spark Big Data Cluster# 🐘 Hadoop-Spark Big Data Cluster# 🐘 Hadoop-Spark Cluster Infrastructure
 
 
 
-Hệ thống Hadoop-Spark phân tán chạy trên Docker Compose. Sẵn sàng cho các bài tập Big Data, xử lý dữ liệu lớn, và phân tích dữ liệu.> Một hệ thống Big Data phân tán hoàn chỉnh chạy trên Docker Compose, sẵn sàng cho các bài tập Big Data, xử lý dữ liệu lớn, và phân tích dữ liệu.
+Hệ thống Hadoop-Spark phân tán chạy trên Docker Compose. Sẵn sàng cho các bài tập Big Data, xử lý dữ liệu lớn, và phân tích dữ liệu.
 
 
 
-**Repository**: https://github.com/SIUTRITUE/Hadoop**Tác giả**: SIUTRITUE  
-
-**Repository**: https://github.com/SIUTRITUE/Hadoop  
-
----**Cập nhật**: 2026-04-06
+**Repository**: https://github.com/SIUTRITUE/hadoop-hoangHệ thống Hadoop-Spark phân tán chạy trên Docker Compose. Sẵn sàng cho các bài tập Big Data, xử lý dữ liệu lớn, và phân tích dữ liệu.> Một hệ thống Big Data phân tán hoàn chỉnh chạy trên Docker Compose, sẵn sàng cho các bài tập Big Data, xử lý dữ liệu lớn, và phân tích dữ liệu.
 
 
 
-## 📋 Kiến Trúc## 📋 Kiến Trúc Hệ Thống
+---
 
 
 
-``````
+## 📋 Kiến Trúc**Repository**: https://github.com/SIUTRITUE/Hadoop**Tác giả**: SIUTRITUE  
+
+
+
+### Services & Components**Repository**: https://github.com/SIUTRITUE/Hadoop  
+
+
+
+| Cluster | Container | Role | Port |---**Cập nhật**: 2026-04-06
+
+|---------|-----------|------|------|
+
+| **Hadoop** | hadoop-master | NameNode + YARN RM | 9870, 8088 |
+
+| | hadoop-worker-1 | DataNode + NodeManager | 9864, 8042 |
+
+| | hadoop-worker-2 | DataNode + NodeManager | 9865, 8043 |## 📋 Kiến Trúc## 📋 Kiến Trúc Hệ Thống
+
+| **Spark** | spark-master | Master + Driver | 8080, 7077 |
+
+| | spark-worker-1 | Executor | 8081, 7078 |
+
+| | spark-worker-2 | Executor | 8082, 7079 |
+
+| **Tools** | jupyter | Notebook Server | 8888 |``````
+
+| | streamlit | Dashboard | 8501 |
 
 Docker Network┌──────────────────────────────────────────────────────────────┐
 
-├── Hadoop Cluster│              Docker Compose Network (hadoop-net)             │
+**Technology Stack:**
 
-│   ├── hadoop-master (NameNode + YARN ResourceManager)├──────────────────────────────────────────────────────────────┤
+- Hadoop 3.3.6 (HDFS + YARN)├── Hadoop Cluster│              Docker Compose Network (hadoop-net)             │
 
-│   ├── hadoop-worker-1 (DataNode + NodeManager)│                                                              │
+- Spark 3.5.0
 
-│   └── hadoop-worker-2 (DataNode + NodeManager)│   HADOOP CLUSTER (HDFS + YARN)                             │
+- Java OpenJDK 11│   ├── hadoop-master (NameNode + YARN ResourceManager)├──────────────────────────────────────────────────────────────┤
 
-││   ┌──────────────┐      ┌──────────┐      ┌──────────┐    │
+- Python 3.10
 
-├── Spark Cluster│   │ hadoop-master│      │hadoop-w1 │      │hadoop-w2 │    │
+- Docker & Docker Compose│   ├── hadoop-worker-1 (DataNode + NodeManager)│                                                              │
 
-│   ├── spark-master (Master + Driver)│   │ :9000 HDFS   │ ◄───►│:9000 HDFS│ ◄───►│:9000 HDFS│    │
+
+
+---│   └── hadoop-worker-2 (DataNode + NodeManager)│   HADOOP CLUSTER (HDFS + YARN)                             │
+
+
+
+## 🚀 Quick Start││   ┌──────────────┐      ┌──────────┐      ┌──────────┐    │
+
+
+
+### Requirements├── Spark Cluster│   │ hadoop-master│      │hadoop-w1 │      │hadoop-w2 │    │
+
+- Docker Desktop (or Docker Engine + Compose)
+
+- 8GB+ RAM for containers│   ├── spark-master (Master + Driver)│   │ :9000 HDFS   │ ◄───►│:9000 HDFS│ ◄───►│:9000 HDFS│    │
+
+- 20GB+ disk space
 
 │   ├── spark-worker-1 (Executor)│   │ :8088 YARN   │      │:8042 YARN│      │:8042 YARN│    │
 
+### Step 1: Start Cluster
+
 │   └── spark-worker-2 (Executor)│   │ :50070 Web   │      │:50075 Web│      │:50075 Web│    │
-
-││   └──────────────┘      └──────────┘      └──────────┘    │
-
-├── Jupyter Notebook (PySpark interactive development)│         ▲ ▲ ▲                                               │
-
-└── Streamlit Dashboard (Results visualization)│         │ │ │                                               │
-
-```│   SPARK CLUSTER (Master + Workers)                        │
-
-│   ┌──────────────┐      ┌──────────┐      ┌──────────┐    │
-
-**Công nghệ:**│   │spark-master  │      │spark-w1  │      │spark-w2  │    │
-
-- Hadoop 3.3.6 (HDFS + YARN)│   │ :7077 Submit │ ◄───►│:7077 Slot│ ◄───►│:7077 Slot│    │
-
-- Spark 3.5.0│   │ :18080 UI    │      │:8081 UI  │      │:8081 UI  │    │
-
-- Java OpenJDK 11│   └──────────────┘      └──────────┘      └──────────┘    │
-
-- Python 3.10│         ▲                                                   │
-
-- Docker & Docker Compose│         │ PySpark Commands                                 │
-
-│   ┌──────────────┐      ┌──────────────┐                  │
-
----│   │   jupyter    │      │  streamlit   │                  │
-
-│   │ :8888 Notebook│      │ :8501 Dashboard                │
-
-## 🚀 Khởi Động Nhanh│   │ • Lab work   │      │ • Visualization                │
-
-│   │ • Analysis   │      │ • Results view                 │
-
-### Yêu Cầu│   └──────────────┘      └──────────────┘                  │
-
-- Docker Desktop (hoặc Docker Engine + Compose)│                                                              │
-
-- 8GB+ RAM cho containers│   SHARED STORAGE (Volumes)                                 │
-
-- 20GB+ disk space│   ├── /volumes/hadoop_name     (HDFS metadata)             │
-
-│   ├── /volumes/hadoop_data     (DataNode storage)          │
-
-### Bước 1: Khởi Động Cluster│   └── /volumes/spark_data      (Temp files)                │
-
-│                                                              │
-
-```bash└──────────────────────────────────────────────────────────────┘
-
-cd d:\BIGDATA\Hoang\hadoop-hoang```
-
-.\start-cluster.bat
-
-```### Services (7 containers)
-
-
-
-Hoặc trên Linux/Mac:| Container | Role | Key Ports | Purpose |
-
-```bash|-----------|------|-----------|---------|
-
-./start-cluster.sh| `hadoop-master` | NameNode + YARN RM | 9000, 8088, 50070 | Cluster coordination |
-
-```| `hadoop-worker1` | DataNode + YARN NM | 9000, 8042, 50075 | Data storage |
-
-| `hadoop-worker2` | DataNode + YARN NM | 9000, 8042, 50075 | Data storage |
-
-### Bước 2: Chờ Services Khởi Động (~2-3 phút)| `spark-master` | Spark Master | 7077, 18080 | Job submission & scheduling |
-
-| `spark-worker1` | Spark Executor | 7077, 8081 | Task execution |
-
-Script sẽ tự động build images, start containers, và chờ services ready.| `spark-worker2` | Spark Executor | 7077, 8081 | Task execution |
-
-| `jupyter` | Notebook Server | 8888 | Interactive development |
-
-### Bước 3: Truy Cập Web UIs| `streamlit-app` | Dashboard | 8501 | Results visualization |
-
-
-
-| Service | URL | Cổng |## 🎯 Mục Đích
-
-|---------|-----|------|
-
-| **Hadoop NameNode** | http://localhost:9870 | 9870 |Hệ thống này được thiết kế để:
-
-| **YARN ResourceManager** | http://localhost:8088 | 8088 |
-
-| **Spark Master** | http://localhost:8080 | 8080 |- ✅ **Học tập & Thực hành**: Hiểu cách hoạt động của Hadoop, Spark, và Big Data
-
-| **Spark Worker 1** | http://localhost:8081 | 8081 |- ✅ **Phát triển ứng dụng**: Xây dựng các jobs Spark, MapReduce trên môi trường thực
-
-| **Spark Worker 2** | http://localhost:8082 | 8082 |- ✅ **Xử lý dữ liệu**: Phân tích dữ liệu lớn bằng Spark SQL, PySpark
-
-| **Jupyter Notebook** | http://localhost:8888 | 8888 |- ✅ **Thực hiện bài tập**: Hoàn thành các assignment về Big Data
-
-| **Streamlit Dashboard** | http://localhost:8501 | 8501 |- ✅ **Prototyping**: Test ideas trước khi deploy lên production
-
-
-
-### Bước 4: Dừng Cluster**Không cần setup phức tạp** - một lệnh là cluster chạy!
-
-
-
-```bash## 🛠️ Công Nghệ Sử Dụng
-
-.\stop-cluster.bat
-
-```| Thành Phần | Phiên Bản | Vai Trò |
-
-|-----------|----------|--------|
-
-Hoặc:| **Hadoop** | 3.3.6 | Distributed filesystem (HDFS) & Resource management (YARN) |
-
-```bash| **Spark** | 3.5.0 | Distributed computing framework |
-
-docker-compose down| **Java** | OpenJDK 11 | Runtime environment |
-
-```| **Jupyter** | Latest | Interactive notebook environment |
-
-| **Docker** | 20.10+ | Containerization |
-
----| **Docker Compose** | 2.0+ | Orchestration |
-
-
-
-## 💻 Các Lệnh Hữu Ích## 🚀 Bắt Đầu Nhanh (Quick Start)
-
-
-
-### Docker Management### Yêu Cầu Tiên Quyết
-
-
-
-```bash- **Docker Desktop** (hoặc Docker Engine + Docker Compose)
-
-# View running containers- Ít nhất **8GB RAM** dành cho containers
-
-docker-compose ps- **20GB disk space** cho images và volumes
-
-- **Port availability**: 9870, 8088, 8080, 8888 (và các port khác)
-
-# View logs (all services)
-
-docker-compose logs -f### Bước 1: Clone/Setup Project
-
-
-
-# View logs of specific service```bash
-
-docker-compose logs -f hadoop-mastercd d:\BIGDATA\Hoang\hadoop-hoang
-
-```
-
-# SSH into container
-
-docker exec -it hadoop-master bash### Bước 2: Khởi Động Cluster
-
-
-
-# Stop/restart services```bash
-
-docker-compose stop.\start-cluster.bat
-
-docker-compose restart```
-
-```
-
-### Bước 3: Chờ Services Khởi Động
-
-### HDFS Commands
-
-Script sẽ tự động:
-
-```bash1. Build Docker images
-
-# SSH vào Hadoop Master2. Start tất cả containers
-
-docker exec -it hadoop-master bash3. Chờ services ready
-
-4. Hiển thị URLs
-
-# List files
-
-hdfs dfs -ls /### Bước 4: Truy Cập Web UIs
-
-
-
-# Create directoryMở browser và truy cập:
-
-hdfs dfs -mkdir -p /user/hadoop/test
-
-| Service | URL | Port |
-
-# Upload file|---------|-----|------|
-
-hdfs dfs -put /path/to/file.txt /user/hadoop/test/| Hadoop NameNode | http://localhost:9870 | 9870 |
-
-| YARN ResourceManager | http://localhost:8088 | 8088 |
-
-# Download file| Spark Master | http://localhost:8080 | 8080 |
-
-hdfs dfs -get /user/hadoop/test/file.txt /path/to/| Spark Worker 1 | http://localhost:8081 | 8081 |
-
-| Spark Worker 2 | http://localhost:8082 | 8082 |
-
-# View file| Jupyter Notebook | http://localhost:8888 | 8888 |
-
-hdfs dfs -cat /user/hadoop/test/file.txt
-
-### Bước 5: Dừng Cluster
-
-# Check HDFS status
-
-hdfs dfsadmin -report```bash
-
-```.\stop-cluster.bat
-
-```
-
-### Spark Commands
-
-Hoặc:
 
 ```bash
 
-# SSH vào Spark Master```bash
+cd d:\BIGDATA\Hoang\hadoop-hoang││   └──────────────┘      └──────────┘      └──────────┘    │
 
-docker exec -it spark-master bashdocker-compose down
+.\start-cluster.bat
+
+```├── Jupyter Notebook (PySpark interactive development)│         ▲ ▲ ▲                                               │
+
+
+
+On Linux/Mac:└── Streamlit Dashboard (Results visualization)│         │ │ │                                               │
+
+```bash
+
+./start-cluster.sh```│   SPARK CLUSTER (Master + Workers)                        │
 
 ```
 
-# Submit job
+│   ┌──────────────┐      ┌──────────┐      ┌──────────┐    │
 
-spark-submit --master spark://spark-master:7077 \## 📁 Cấu Trúc Thư Mục
+### Step 2: Wait for Services (~2-3 minutes)
 
-             --executor-memory 1g \
+**Công nghệ:**│   │spark-master  │      │spark-w1  │      │spark-w2  │    │
 
-             your_script.py```
+The script will automatically build images, start containers, and perform health checks.
+
+- Hadoop 3.3.6 (HDFS + YARN)│   │ :7077 Submit │ ◄───►│:7077 Slot│ ◄───►│:7077 Slot│    │
+
+### Step 3: Access Web UIs
+
+- Spark 3.5.0│   │ :18080 UI    │      │:8081 UI  │      │:8081 UI  │    │
+
+| Service | URL | Port |
+
+|---------|-----|------|- Java OpenJDK 11│   └──────────────┘      └──────────┘      └──────────┘    │
+
+| **Hadoop NameNode** | http://localhost:9870 | 9870 |
+
+| **YARN ResourceManager** | http://localhost:8088 | 8088 |- Python 3.10│         ▲                                                   │
+
+| **Spark Master** | http://localhost:8080 | 8080 |
+
+| **Spark Worker 1** | http://localhost:8081 | 8081 |- Docker & Docker Compose│         │ PySpark Commands                                 │
+
+| **Spark Worker 2** | http://localhost:8082 | 8082 |
+
+| **Jupyter Notebook** | http://localhost:8888 | 8888 |│   ┌──────────────┐      ┌──────────────┐                  │
+
+| **Streamlit Dashboard** | http://localhost:8501 | 8501 |
+
+---│   │   jupyter    │      │  streamlit   │                  │
+
+### Step 4: Stop Cluster
+
+│   │ :8888 Notebook│      │ :8501 Dashboard                │
+
+```bash
+
+.\stop-cluster.bat## 🚀 Khởi Động Nhanh│   │ • Lab work   │      │ • Visualization                │
+
+```
+
+│   │ • Analysis   │      │ • Results view                 │
+
+Or:
+
+```bash### Yêu Cầu│   └──────────────┘      └──────────────┘                  │
+
+docker-compose down
+
+```- Docker Desktop (hoặc Docker Engine + Compose)│                                                              │
+
+
+
+---- 8GB+ RAM cho containers│   SHARED STORAGE (Volumes)                                 │
+
+
+
+## 💻 Useful Commands- 20GB+ disk space│   ├── /volumes/hadoop_name     (HDFS metadata)             │
+
+
+
+### Docker Management│   ├── /volumes/hadoop_data     (DataNode storage)          │
+
+
+
+```bash### Bước 1: Khởi Động Cluster│   └── /volumes/spark_data      (Temp files)                │
+
+# View running containers
+
+docker-compose ps│                                                              │
+
+
+
+# View all logs```bash└──────────────────────────────────────────────────────────────┘
+
+docker-compose logs -f
+
+cd d:\BIGDATA\Hoang\hadoop-hoang```
+
+# View specific service logs
+
+docker-compose logs -f hadoop-master.\start-cluster.bat
+
+
+
+# SSH into container```### Services (7 containers)
+
+docker exec -it hadoop-master bash
+
+
+
+# Restart services
+
+docker-compose restartHoặc trên Linux/Mac:| Container | Role | Key Ports | Purpose |
+
+```
+
+```bash|-----------|------|-----------|---------|
+
+### HDFS Commands
+
+./start-cluster.sh| `hadoop-master` | NameNode + YARN RM | 9000, 8088, 50070 | Cluster coordination |
+
+```bash
+
+# SSH to Hadoop Master```| `hadoop-worker1` | DataNode + YARN NM | 9000, 8042, 50075 | Data storage |
+
+docker exec -it hadoop-master bash
+
+| `hadoop-worker2` | DataNode + YARN NM | 9000, 8042, 50075 | Data storage |
+
+# List files
+
+hdfs dfs -ls /### Bước 2: Chờ Services Khởi Động (~2-3 phút)| `spark-master` | Spark Master | 7077, 18080 | Job submission & scheduling |
+
+
+
+# Create directory| `spark-worker1` | Spark Executor | 7077, 8081 | Task execution |
+
+hdfs dfs -mkdir -p /user/hadoop/test
+
+Script sẽ tự động build images, start containers, và chờ services ready.| `spark-worker2` | Spark Executor | 7077, 8081 | Task execution |
+
+# Upload file
+
+hdfs dfs -put /path/to/file.txt /user/hadoop/test/| `jupyter` | Notebook Server | 8888 | Interactive development |
+
+
+
+# Download file### Bước 3: Truy Cập Web UIs| `streamlit-app` | Dashboard | 8501 | Results visualization |
+
+hdfs dfs -get /user/hadoop/test/file.txt /path/to/
+
+
+
+# View file content
+
+hdfs dfs -cat /user/hadoop/test/file.txt| Service | URL | Cổng |## 🎯 Mục Đích
+
+
+
+# Check HDFS status|---------|-----|------|
+
+hdfs dfsadmin -report
+
+```| **Hadoop NameNode** | http://localhost:9870 | 9870 |Hệ thống này được thiết kế để:
+
+
+
+### Spark Commands| **YARN ResourceManager** | http://localhost:8088 | 8088 |
+
+
+
+```bash| **Spark Master** | http://localhost:8080 | 8080 |- ✅ **Học tập & Thực hành**: Hiểu cách hoạt động của Hadoop, Spark, và Big Data
+
+# SSH to Spark Master
+
+docker exec -it spark-master bash| **Spark Worker 1** | http://localhost:8081 | 8081 |- ✅ **Phát triển ứng dụng**: Xây dựng các jobs Spark, MapReduce trên môi trường thực
+
+
+
+# Submit job| **Spark Worker 2** | http://localhost:8082 | 8082 |- ✅ **Xử lý dữ liệu**: Phân tích dữ liệu lớn bằng Spark SQL, PySpark
+
+spark-submit --master spark://spark-master:7077 \
+
+             --executor-memory 1g \| **Jupyter Notebook** | http://localhost:8888 | 8888 |- ✅ **Thực hiện bài tập**: Hoàn thành các assignment về Big Data
+
+             your_script.py
+
+| **Streamlit Dashboard** | http://localhost:8501 | 8501 |- ✅ **Prototyping**: Test ideas trước khi deploy lên production
+
+# Spark shell
+
+spark-shell --master spark://spark-master:7077
+
+
+
+# PySpark shell### Bước 4: Dừng Cluster**Không cần setup phức tạp** - một lệnh là cluster chạy!
+
+pyspark --master spark://spark-master:7077
+
+```
+
+
+
+### Jupyter```bash## 🛠️ Công Nghệ Sử Dụng
+
+
+
+Access: http://localhost:8888.\stop-cluster.bat
+
+
+
+Get token:```| Thành Phần | Phiên Bản | Vai Trò |
+
+```bash
+
+docker logs jupyter-notebook | grep "token="|-----------|----------|--------|
+
+```
+
+Hoặc:| **Hadoop** | 3.3.6 | Distributed filesystem (HDFS) & Resource management (YARN) |
+
+---
+
+```bash| **Spark** | 3.5.0 | Distributed computing framework |
+
+## 🧪 Test Cluster
+
+docker-compose down| **Java** | OpenJDK 11 | Runtime environment |
+
+### Test 1: HDFS Connectivity
+
+```| **Jupyter** | Latest | Interactive notebook environment |
+
+```bash
+
+docker exec hadoop-master hdfs dfs -ls /| **Docker** | 20.10+ | Containerization |
+
+```
+
+---| **Docker Compose** | 2.0+ | Orchestration |
+
+Expected: List of directories
+
+
+
+### Test 2: YARN Nodes
+
+## 💻 Các Lệnh Hữu Ích## 🚀 Bắt Đầu Nhanh (Quick Start)
+
+```bash
+
+docker exec hadoop-master yarn node -list
+
+```
+
+### Docker Management### Yêu Cầu Tiên Quyết
+
+Expected: 2 DataNodes listed
+
+
+
+### Test 3: Spark Master
+
+```bash- **Docker Desktop** (hoặc Docker Engine + Docker Compose)
+
+Visit http://localhost:8080
+
+# View running containers- Ít nhất **8GB RAM** dành cho containers
+
+Expected: Spark Master UI with 2 workers
+
+docker-compose ps- **20GB disk space** cho images và volumes
+
+### Test 4: PySpark in Jupyter
+
+- **Port availability**: 9870, 8088, 8080, 8888 (và các port khác)
+
+1. Open http://localhost:8888
+
+2. Create new Python notebook# View logs (all services)
+
+3. Run:
+
+docker-compose logs -f### Bước 1: Clone/Setup Project
+
+```python
+
+from pyspark.sql import SparkSession
+
+
+
+spark = SparkSession.builder \# View logs of specific service```bash
+
+    .appName("Test") \
+
+    .master("spark://spark-master:7077") \docker-compose logs -f hadoop-mastercd d:\BIGDATA\Hoang\hadoop-hoang
+
+    .config("spark.hadoop.fs.defaultFS", "hdfs://hadoop-master:9000") \
+
+    .getOrCreate()```
+
+
+
+# Create DataFrame# SSH into container
+
+data = [("Alice", 25), ("Bob", 30), ("Charlie", 35)]
+
+df = spark.createDataFrame(data, ["Name", "Age"])docker exec -it hadoop-master bash### Bước 2: Khởi Động Cluster
+
+df.show()
+
+```
+
+
+
+Expected: DataFrame displayed with 3 rows# Stop/restart services```bash
+
+
+
+---docker-compose stop.\start-cluster.bat
+
+
+
+## 📊 Streamlit Dashboarddocker-compose restart```
+
+
+
+Dashboard automatically runs on port 8501.```
+
+
+
+**Access**: http://localhost:8501### Bước 3: Chờ Services Khởi Động
+
+
+
+**Features:**### HDFS Commands
+
+- Tab 1: Data Analysis (from HDFS)
+
+- Tab 2: Query Results (Spark SQL results)Script sẽ tự động:
+
+- Tab 3: Model Metrics (ML performance)
+
+- Tab 4: Project Info```bash1. Build Docker images
+
+
+
+Edit `streamlit/app.py` to customize.# SSH vào Hadoop Master2. Start tất cả containers
+
+
+
+---docker exec -it hadoop-master bash3. Chờ services ready
+
+
+
+## 📁 Directory Structure4. Hiển thị URLs
+
+
+
+```# List files
 
 hadoop-hoang/
 
-# Spark shell├── docker/
+├── docker/                 # Docker imageshdfs dfs -ls /### Bước 4: Truy Cập Web UIs
 
-spark-shell --master spark://spark-master:7077│   ├── Dockerfile.hadoop       # Hadoop base image
+│   ├── Dockerfile.hadoop
 
-│   ├── Dockerfile.spark        # Spark base image
+│   ├── Dockerfile.spark
 
-# PySpark shell│   └── Dockerfile.jupyter      # Jupyter with PySpark
+│   ├── Dockerfile.jupyter
 
-pyspark --master spark://spark-master:7077├── config/
+│   └── Dockerfile.streamlit# Create directoryMở browser và truy cập:
 
-```│   ├── hadoop/
+├── config/                 # Configuration files
 
-│   │   ├── core-site.xml       # Hadoop core configuration
+│   ├── hadoop/hdfs dfs -mkdir -p /user/hadoop/test
 
-### Jupyter│   │   ├── hdfs-site.xml       # HDFS configuration
+│   │   ├── core-site.xml
 
-│   │   └── yarn-site.xml       # YARN configuration
+│   │   ├── hdfs-site.xml| Service | URL | Port |
 
-Truy cập: http://localhost:8888│   └── spark/
+│   │   └── yarn-site.xml
 
-│       └── spark-defaults.conf # Spark configuration
+│   └── spark/# Upload file|---------|-----|------|
 
-Lấy token:├── scripts/
+│       └── spark-defaults.conf
 
-```bash│   ├── init-hadoop.sh          # Initialize Hadoop
+├── scripts/                # Startup scriptshdfs dfs -put /path/to/file.txt /user/hadoop/test/| Hadoop NameNode | http://localhost:9870 | 9870 |
 
-docker logs jupyter-notebook | grep "token="│   ├── healthcheck.sh          # Health check script
+├── notebooks/              # Jupyter notebooks
 
-```│   ├── entrypoint-hadoop-master.sh
+├── streamlit/              # Dashboard| YARN ResourceManager | http://localhost:8088 | 8088 |
 
-│   ├── entrypoint-hadoop-worker.sh
+│   └── app.py
 
----│   ├── entrypoint-spark-master.sh
+├── volumes/                # Persistent storage# Download file| Spark Master | http://localhost:8080 | 8080 |
 
-│   └── entrypoint-spark-worker.sh
+├── docker-compose.yml
 
-## 🧪 Test Cluster├── notebooks/
+├── start-cluster.bathdfs dfs -get /user/hadoop/test/file.txt /path/to/| Spark Worker 1 | http://localhost:8081 | 8081 |
 
-│   ├── 01-Test-Connection.ipynb      # Test HDFS/Spark connection
+├── stop-cluster.bat
 
-### Test 1: HDFS│   ├── 02-WordCount-Example.ipynb    # WordCount MapReduce example
-
-│   └── 03-Data-Processing-Pipeline.ipynb # Spark data processing
-
-```bash├── volumes/
-
-docker exec hadoop-master hdfs dfs -ls /│   ├── hadoop_name/            # NameNode persistent storage
-
-```│   └── hadoop_data/            # DataNode persistent storage
-
-├── docker-compose.yml          # Main orchestration file
-
-Expected: Danh sách thư mục├── start-cluster.bat           # Startup script (Windows)
-
-├── start-cluster.sh            # Startup script (Linux/Mac)
-
-### Test 2: YARN├── stop-cluster.bat            # Stop script (Windows)
-
-├── stop-cluster.sh             # Stop script (Linux/Mac)
-
-```bash└── README.md                   # This file
-
-docker exec hadoop-master yarn node -list```
+└── README.md| Spark Worker 2 | http://localhost:8082 | 8082 |
 
 ```
 
+# View file| Jupyter Notebook | http://localhost:8888 | 8888 |
+
+---
+
+hdfs dfs -cat /user/hadoop/test/file.txt
+
+## 📚 Usage Examples
+
+### Bước 5: Dừng Cluster
+
+### Example 1: Read CSV from HDFS
+
+# Check HDFS status
+
+```python
+
+df = spark.read.csv("hdfs://hadoop-master:9000/data.csv", header=True)hdfs dfsadmin -report```bash
+
+df.show()
+
+``````.\stop-cluster.bat
+
+
+
+### Example 2: SQL Query```
+
+
+
+```python### Spark Commands
+
+df.createOrReplaceTempView("data")
+
+results = spark.sql("SELECT * FROM data WHERE age > 25")Hoặc:
+
+results.show()
+
+``````bash
+
+
+
+### Example 3: Save Results to HDFS# SSH vào Spark Master```bash
+
+
+
+```pythondocker exec -it spark-master bashdocker-compose down
+
+df.write.mode("overwrite").csv("hdfs://hadoop-master:9000/output")
+
+``````
+
+
+
+### Example 4: Machine Learning# Submit job
+
+
+
+```pythonspark-submit --master spark://spark-master:7077 \## 📁 Cấu Trúc Thư Mục
+
+from pyspark.ml.classification import LogisticRegression
+
+             --executor-memory 1g \
+
+lr = LogisticRegression(maxIter=10)
+
+model = lr.fit(df)             your_script.py```
+
+model.save("hdfs://hadoop-master:9000/models/lr")
+
+```hadoop-hoang/
+
+
+
+---# Spark shell├── docker/
+
+
+
+## 🔧 Configurationspark-shell --master spark://spark-master:7077│   ├── Dockerfile.hadoop       # Hadoop base image
+
+
+
+### Adjust Memory│   ├── Dockerfile.spark        # Spark base image
+
+
+
+Edit `config/spark/spark-defaults.conf`:# PySpark shell│   └── Dockerfile.jupyter      # Jupyter with PySpark
+
+
+
+```confpyspark --master spark://spark-master:7077├── config/
+
+spark.executor.memory    1g      # Change to 512m if low RAM
+
+spark.executor.cores     2```│   ├── hadoop/
+
+```
+
+│   │   ├── core-site.xml       # Hadoop core configuration
+
+### Add Hadoop Worker
+
+### Jupyter│   │   ├── hdfs-site.xml       # HDFS configuration
+
+1. Copy `hadoop-worker-1` service in `docker-compose.yml`
+
+2. Rename to `hadoop-worker-3` and update ports│   │   └── yarn-site.xml       # YARN configuration
+
+3. Run: `docker-compose up -d hadoop-worker-3`
+
+Truy cập: http://localhost:8888│   └── spark/
+
+---
+
+│       └── spark-defaults.conf # Spark configuration
+
+## ❌ Troubleshooting
+
+Lấy token:├── scripts/
+
+### Containers not starting
+
+```bash│   ├── init-hadoop.sh          # Initialize Hadoop
+
+```bash
+
+docker stats  # Check available resourcesdocker logs jupyter-notebook | grep "token="│   ├── healthcheck.sh          # Health check script
+
+docker-compose logs  # Check error logs
+
+``````│   ├── entrypoint-hadoop-master.sh
+
+
+
+Ensure 8GB+ RAM available.│   ├── entrypoint-hadoop-worker.sh
+
+
+
+### HDFS format error---│   ├── entrypoint-spark-master.sh
+
+
+
+```bash│   └── entrypoint-spark-worker.sh
+
+docker-compose down -v  # Remove volumes
+
+```## 🧪 Test Cluster├── notebooks/
+
+
+
+### Spark workers not connecting│   ├── 01-Test-Connection.ipynb      # Test HDFS/Spark connection
+
+
+
+```bash### Test 1: HDFS│   ├── 02-WordCount-Example.ipynb    # WordCount MapReduce example
+
+docker-compose logs spark-master
+
+docker-compose logs spark-worker-1│   └── 03-Data-Processing-Pipeline.ipynb # Spark data processing
+
+```
+
+```bash├── volumes/
+
+### Jupyter can't connect to Spark
+
+docker exec hadoop-master hdfs dfs -ls /│   ├── hadoop_name/            # NameNode persistent storage
+
+- Run cells one by one
+
+- Wait for Spark to start (30-60 seconds)```│   └── hadoop_data/            # DataNode persistent storage
+
+
+
+### Port conflict├── docker-compose.yml          # Main orchestration file
+
+
+
+Edit `docker-compose.yml`:Expected: Danh sách thư mục├── start-cluster.bat           # Startup script (Windows)
+
+
+
+```yaml├── start-cluster.sh            # Startup script (Linux/Mac)
+
+ports:
+
+  - "19870:9870"  # Map to different port### Test 2: YARN├── stop-cluster.bat            # Stop script (Windows)
+
+```
+
+├── stop-cluster.sh             # Stop script (Linux/Mac)
+
+---
+
+```bash└── README.md                   # This file
+
+## 📖 References
+
+docker exec hadoop-master yarn node -list```
+
+- [Hadoop Documentation](https://hadoop.apache.org/docs/r3.3.6/)
+
+- [Spark Documentation](https://spark.apache.org/docs/3.5.0/)```
+
+- [Docker Compose](https://docs.docker.com/compose/)
+
 ## 🔧 Cấu Hình
+
+---
 
 Expected: Danh sách nodes (2 DataNodes)
 
+## 📝 Notes
+
 ### core-site.xml
 
-### Test 3: SparkCấu hình HDFS NameNode và proxy users
+- HDFS NameNode RPC: `hdfs://hadoop-master:9000`
 
+- Spark Master: `spark://spark-master:7077`### Test 3: SparkCấu hình HDFS NameNode và proxy users
 
+- Network: `hadoop-spark-network`
+
+- Persistent volumes in `volumes/` directory
+
+- All services have health checks
 
 Truy cập http://localhost:8080```xml
 
+---
+
 <property>
 
-Expected: Spark Master UI với 2 workers    <name>fs.defaultFS</name>
+**Version**: 1.0  
+
+**Last Updated**: 2026-04-06  Expected: Spark Master UI với 2 workers    <name>fs.defaultFS</name>
+
+**License**: MIT
 
     <value>hdfs://hadoop-master:9000</value>
 
