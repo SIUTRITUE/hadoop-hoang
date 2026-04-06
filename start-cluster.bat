@@ -92,6 +92,20 @@ for /L %%i in (1,1,30) do (
 )
 
 :jupyter_ready
+echo Waiting for Streamlit...
+timeout /t 5 /nobreak
+
+for /L %%i in (1,1,30) do (
+    docker exec streamlit-app curl -s http://localhost:8501 >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo Streamlit is ready!
+        goto streamlit_ready
+    )
+    echo Attempt %%i/30: Waiting for Streamlit...
+    timeout /t 2 /nobreak
+)
+
+:streamlit_ready
 echo.
 echo ============================================
 echo Cluster Startup Completed!
@@ -104,6 +118,7 @@ echo  - Spark Master: http://localhost:8080
 echo  - Spark Worker 1: http://localhost:8081
 echo  - Spark Worker 2: http://localhost:8082
 echo  - Jupyter Notebook: http://localhost:8888
+echo  - Streamlit Dashboard: http://localhost:8501
 echo.
 echo Useful Commands:
 echo  - View logs: docker-compose logs -f

@@ -255,6 +255,30 @@ services:
     command: echo "Network is ready"
     restart: "no"
 
+  # ============================================
+  # STREAMLIT DASHBOARD
+  # ============================================
+
+  streamlit:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.streamlit
+    container_name: streamlit-app
+    hostname: streamlit
+    networks:
+      - hadoop-spark-network
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./streamlit:/app
+      - ./notebooks:/data
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - HADOOP_NAMENODE=hdfs://hadoop-master:9000
+    depends_on:
+      - spark-master
+    restart: unless-stopped
+
 networks:
   hadoop-spark-network:
     driver: bridge
